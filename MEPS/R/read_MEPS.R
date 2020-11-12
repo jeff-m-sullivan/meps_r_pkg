@@ -8,6 +8,7 @@
 #' @param year (required if 'file' is missing) data year, between 1996 and most current file release.
 #' @param type (required if 'file' is missing) file type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), and 'RXLK' (PMED - events link file)
 #' @param dir (optional) local directory containing .ssp or .dat files. If left blank, files will be downloaded from MEPS website(requires internet connection).
+#' @param save_raw (optional) directory to save downloaded data files to for later reuse
 #'
 #' @return MEPS data as a data frame.
 #' @export
@@ -27,7 +28,7 @@
 
 
 
-read_MEPS <- function(file, year, type, dir, web) {
+read_MEPS <- function(file, year, type, dir, web, save_raw) {
 
   # QC checks on var inputs ---------------------------------------------------
 
@@ -43,6 +44,9 @@ read_MEPS <- function(file, year, type, dir, web) {
   # If file and year and type are all specified, note that file is used
   if(!missing(file) & !(missing(year) & missing(type)))
     warning("Both file name and year or type have been specified. Using file name.")
+
+  if(missing(save_raw))
+    save_raw <- tempdir()
 
   # Set fname and extension (ssp or dat) --------------------------------------
 
@@ -107,7 +111,7 @@ read_MEPS <- function(file, year, type, dir, web) {
 
   if(web) {
     # download from website and save to temporary folder
-    meps_file <- dl_meps(fname_web, ext)
+    meps_file <- dl_meps(fname_web, ext, save_raw)
 
   } else {
     # set local path
